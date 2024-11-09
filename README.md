@@ -7,7 +7,7 @@
   1. Data Model and DAO
      The data model and DAO (Data Access Object) classes are located at:
      
-          >> java/com
+          >> src/main/java/com
 
       #### These classes are responsible for:
 
