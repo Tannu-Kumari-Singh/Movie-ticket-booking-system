@@ -1,23 +1,37 @@
 package com.user.dao;
 
 import java.sql.*;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import com.util.Constants;
 import com.user.model.User;
 
 public class UserDao {
 	
-	private String URL="jdbc:mysql://localhost:3306/Movie_Ticket_Booking_System";
-	
-    private String USERNAME = "root"; 
-    private String PASSWORD = "Nitin@1513";
+	private String URL = Constants.DB_URL;
+	private String USERNAME = Constants.DB_USERNAME;
+	private String PASSWORD = Constants.DB_PASSWORD;
     
-    private static final String INSERT_USER_SQL = "INSERT INTO users (username, name, email, country, address, password) VALUES (?,?,?,?,?,?);";
-    private static final String SELECT_USER_BY_ID="SELECT user_id, username, name, email, country, address, password, created_at FROM users WHERE user_id=?;";
-    private static final String  SELECT_ALL_USERS="SELECT user_id, username, name, email, country, address, password, created_at FROM users;";
-    private static final String DELETE_USER_SQL="DELETE FROM users WHERE user_id=?;";
-    private static final String UPDATE_USERS_SQL="UPDATE users SET username=?, name=?, email=?, country=?, address=?, password=? WHERE user_id=?;";
-    private static final String SELECT_USER_BY_EMAIL_AND_PASSWORD = "SELECT user_id, username, name, email, country, address, password, created_at FROM users WHERE email=? AND password=?;";
+    private static final String INSERT_USER_SQL = 
+        "INSERT INTO users (username, name, email, country, address, password, role) " +
+        "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        
+    private static final String SELECT_USER_BY_ID = 
+        "SELECT user_id, username, name, email, country, address, password, role, created_at " +
+        "FROM users WHERE user_id = ?";
+        
+    private static final String SELECT_USER_BY_EMAIL_AND_PASSWORD = 
+        "SELECT user_id, username, name, email, country, address, password, role, created_at " +
+        "FROM users WHERE email = ? AND password = ?";
+        
+    private static final String UPDATE_USERS_SQL = 
+        "UPDATE users SET name=?, email=?, country=?, address=? WHERE user_id=?";
+        
+    private static final String SELECT_ALL_USERS = "SELECT user_id, username, name, email, country, address, password, role, created_at FROM users;";
+    private static final String DELETE_USER_SQL = "DELETE FROM users WHERE user_id=?;";
+    
 	public UserDao() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -41,36 +55,27 @@ public class UserDao {
     }
     
     
-    public void insertUser(User user) throws SQLException {
+    public boolean insertUser(User user) throws SQLException {
         if (!user.isValidEmail() || !user.isValidPassword()) {
             throw new IllegalArgumentException("Invalid email or password");
         }
         
-        Connection connection = null;
-        PreparedStatement stmt = null;
-        
-        try {
-            connection = getConnection();
-            stmt = connection.prepareStatement(INSERT_USER_SQL);
+        try (Connection connection = getConnection();
+             PreparedStatement stmt = connection.prepareStatement(INSERT_USER_SQL)) {
             stmt.setString(1, user.getUsername());
             stmt.setString(2, user.getName());
             stmt.setString(3, user.getEmail());
             stmt.setString(4, user.getCountry());
             stmt.setString(5, user.getAddress());
             stmt.setString(6, user.getPassword());
+            stmt.setString(7, user.getRole() != null ? user.getRole() : "USER");
             
-            int result = stmt.executeUpdate();
-            if (result != 1) {
-                throw new SQLException("Registration failed");
-            }
-        } finally {
-            if (stmt != null) stmt.close();
-            if (connection != null) connection.close();
+            return stmt.executeUpdate() > 0;
         }
     }
     
     private User mapResultSetToUser(ResultSet rs) throws SQLException {
-        return new User(
+        User user = new User(
             rs.getInt("user_id"),
             rs.getString("username"),
             rs.getString("name"),
@@ -79,6 +84,9 @@ public class UserDao {
             rs.getString("address"),
             rs.getString("password")
         );
+        user.setRole(rs.getString("role"));
+        user.setCreated_at(rs.getTimestamp("created_at"));
+        return user;
     }
 
     public User selectuser(int userId) {
@@ -97,22 +105,14 @@ public class UserDao {
     }
     
     public List<User> selectAllUsers() {
-        List<User> users = new ArrayList<User>();
-        try (Connection connection = getConnection()) {
-            PreparedStatement preparedstatement = connection.prepareStatement(SELECT_ALL_USERS);
-            ResultSet resultset = preparedstatement.executeQuery();
-            while (resultset.next()) {
-                int id = resultset.getInt("user_id");
-                String username = resultset.getString("username");
-                String name = resultset.getString("name");
-                String email = resultset.getString("email");
-                String country = resultset.getString("country");
-                String address = resultset.getString("address");
-                String password = resultset.getString("password");
-                
-                users.add(new User(id, username, name, email, country, address, password));
+        List<User> users = new ArrayList<>();
+        try (Connection connection = getConnection();
+             PreparedStatement stmt = connection.prepareStatement(SELECT_ALL_USERS)) {
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                users.add(mapResultSetToUser(rs));
             }
-        } catch(Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return users;
@@ -173,23 +173,14 @@ public class UserDao {
     }
     
     public boolean updateUser(User user) throws SQLException {
-        boolean rowUpdated = false;
         try (Connection connection = getConnection();
-             PreparedStatement statement = connection.prepareStatement(UPDATE_USERS_SQL)) {
-            
-            statement.setString(1, user.getUsername());
-            statement.setString(2, user.getName());
-            statement.setString(3, user.getEmail());
-            statement.setString(4, user.getCountry());
-            statement.setString(5, user.getAddress());
-            statement.setString(6, user.getPassword());
-            statement.setInt(7, user.getUserId());
-
-            rowUpdated = statement.executeUpdate() > 0;
-        } catch (SQLException e) {
-            System.out.println("Error updating user: " + e.getMessage());
-            throw e;
+             PreparedStatement stmt = connection.prepareStatement(UPDATE_USERS_SQL)) {
+            stmt.setString(1, user.getName());
+            stmt.setString(2, user.getEmail());
+            stmt.setString(3, user.getCountry());
+            stmt.setString(4, user.getAddress());
+            stmt.setInt(5, user.getUser_id());
+            return stmt.executeUpdate() > 0;
         }
-        return rowUpdated;
     }
 }

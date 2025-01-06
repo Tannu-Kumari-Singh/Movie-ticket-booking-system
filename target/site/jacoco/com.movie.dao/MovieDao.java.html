@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MovieDao.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">movie-ticket-booking-system Maven Webapp</a> &gt; <a href="index.source.html" class="el_package">com.movie.dao</a> &gt; <span class="el_source">MovieDao.java</span></div><h1>MovieDao.java</h1><pre class="source lang-java linenums">package com.movie.dao;
+
+import java.sql.*;
+
+
+import com.movie.model.Movie;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.util.Constants;
+import com.util.DatabaseConnection;
+
+public class MovieDao {
+<span class="fc" id="L14">    private String jdbcURL = Constants.DB_URL;</span>
+<span class="fc" id="L15">    private String jdbcUsername = Constants.DB_USERNAME;</span>
+<span class="fc" id="L16">    private String jdbcPassword = Constants.DB_PASSWORD;</span>
+
+    private static final String SELECT_ALL_MOVIES = 
+        &quot;SELECT movie_id, title, description, genre, duration, release_date, status, rating, image_url, price, created_at FROM movies&quot;;
+    private static final String SEARCH_MOVIES = 
+        &quot;SELECT movie_id, title, description, genre, rating, image_url, price, created_at FROM movies WHERE title LIKE ? OR genre LIKE ?&quot;;
+    
+    private static final String ADD_MOVIE =  &quot;INSERT INTO movies ( title, description, genre, duration, release_date,status, rating, image_url, price ) VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)&quot;;
+    
+    private static final String DELETE_MOVIE =  &quot;DELETE FROM movies WHERE movie_id=?&quot;;
+    
+    private static final String UPDATE_MOVIE = 
+        &quot;UPDATE movies SET title=?, description=?, genre=?, duration=?, release_date=?, status=?, rating=?, image_url=?, price=? &quot;
+      + &quot;WHERE movie_id=?&quot;;
+
+<span class="fc" id="L31">    public MovieDao() {</span>
+        try {
+<span class="fc" id="L33">            Class.forName(&quot;com.mysql.cj.jdbc.Driver&quot;);</span>
+<span class="nc" id="L34">        } catch (ClassNotFoundException e) {</span>
+<span class="nc" id="L35">            e.printStackTrace();</span>
+<span class="fc" id="L36">        }</span>
+<span class="fc" id="L37">    }</span>
+
+    public List&lt;Movie&gt; getAllMovies() {
+<span class="fc" id="L40">        List&lt;Movie&gt; movies = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L41">        try (Connection connection = DriverManager.getConnection(jdbcURL, jdbcUsername, jdbcPassword);</span>
+<span class="fc" id="L42">             PreparedStatement ps = connection.prepareStatement(SELECT_ALL_MOVIES)) {</span>
+            
+<span class="fc" id="L44">            System.out.println(&quot;Executing query: &quot; + SELECT_ALL_MOVIES);</span>
+<span class="fc" id="L45">            ResultSet rs = ps.executeQuery();</span>
+            
+<span class="fc bfc" id="L47" title="All 2 branches covered.">            while (rs.next()) {</span>
+<span class="fc" id="L48">                Movie movie = new Movie();</span>
+<span class="fc" id="L49">                movie.setMovieId(rs.getInt(&quot;movie_id&quot;));</span>
+<span class="fc" id="L50">                movie.setTitle(rs.getString(&quot;title&quot;));</span>
+<span class="fc" id="L51">                movie.setDescription(rs.getString(&quot;description&quot;));</span>
+<span class="fc" id="L52">                movie.setGenre(rs.getString(&quot;genre&quot;));</span>
+<span class="fc" id="L53">                movie.setDuration(rs.getString(&quot;duration&quot;));</span>
+<span class="fc" id="L54">                movie.setReleaseDate(rs.getDate(&quot;release_date&quot;)); // Make sure this line exists</span>
+<span class="fc" id="L55">                movie.setStatus(rs.getString(&quot;status&quot;));</span>
+<span class="fc" id="L56">                movie.setRating(rs.getBigDecimal(&quot;rating&quot;));</span>
+<span class="fc" id="L57">                movie.setImageUrl(rs.getString(&quot;image_url&quot;));</span>
+<span class="fc" id="L58">                movie.setPrice(rs.getDouble(&quot;price&quot;));</span>
+<span class="fc" id="L59">                movie.setCreatedAt(rs.getTimestamp(&quot;created_at&quot;));</span>
+<span class="fc" id="L60">                movies.add(movie);</span>
+<span class="fc" id="L61">                System.out.println(&quot;Loaded movie: &quot; + movie.getTitle() + &quot;, Release Date: &quot; + movie.getReleaseDate()); // Add debug log</span>
+<span class="fc" id="L62">            }</span>
+<span class="nc" id="L63">        } catch (SQLException e) {</span>
+<span class="nc" id="L64">            System.err.println(&quot;Database error: &quot; + e.getMessage());</span>
+<span class="nc" id="L65">            e.printStackTrace();</span>
+<span class="fc" id="L66">        }</span>
+<span class="fc" id="L67">        return movies;</span>
+    }
+
+    public List&lt;Movie&gt; searchMovies(String query) {
+<span class="fc" id="L71">        List&lt;Movie&gt; movies = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L72">        try (Connection connection = DriverManager.getConnection(jdbcURL, jdbcUsername, jdbcPassword);</span>
+<span class="fc" id="L73">             PreparedStatement ps = connection.prepareStatement(SEARCH_MOVIES)) {</span>
+<span class="fc" id="L74">            String searchQuery = &quot;%&quot; + query + &quot;%&quot;;</span>
+<span class="fc" id="L75">            ps.setString(1, searchQuery);</span>
+<span class="fc" id="L76">            ps.setString(2, searchQuery);</span>
+<span class="fc" id="L77">            ResultSet rs = ps.executeQuery();</span>
+<span class="pc bpc" id="L78" title="1 of 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc" id="L79">                Movie movie = new Movie();</span>
+<span class="nc" id="L80">                movie.setMovieId(rs.getInt(&quot;movie_id&quot;)); // Fix column name</span>
+<span class="nc" id="L81">                movie.setTitle(rs.getString(&quot;title&quot;));</span>
+<span class="nc" id="L82">                movie.setDescription(rs.getString(&quot;description&quot;));</span>
+<span class="nc" id="L83">                movie.setGenre(rs.getString(&quot;genre&quot;));</span>
+<span class="nc" id="L84">                movie.setRating(rs.getBigDecimal(&quot;rating&quot;));</span>
+<span class="nc" id="L85">                movie.setImageUrl(rs.getString(&quot;image_url&quot;));</span>
+<span class="nc" id="L86">                movie.setPrice(rs.getDouble(&quot;price&quot;));</span>
+<span class="nc" id="L87">                movie.setCreatedAt(rs.getTimestamp(&quot;created_at&quot;));</span>
+<span class="nc" id="L88">                movies.add(movie);</span>
+<span class="nc" id="L89">            }</span>
+<span class="nc" id="L90">        } catch (SQLException e) {</span>
+<span class="nc" id="L91">            System.err.println(&quot;Search error: &quot; + e.getMessage());</span>
+<span class="nc" id="L92">            e.printStackTrace();</span>
+<span class="fc" id="L93">        }</span>
+<span class="fc" id="L94">        return movies;</span>
+    }
+
+    public List&lt;Movie&gt; getRecentMovies(int limit) {
+<span class="nc" id="L98">        List&lt;Movie&gt; movies = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L99">        String query = SELECT_ALL_MOVIES + &quot; ORDER BY created_at DESC LIMIT ?&quot;;</span>
+        
+<span class="nc" id="L101">        try (Connection connection = DriverManager.getConnection(jdbcURL, jdbcUsername, jdbcPassword);</span>
+<span class="nc" id="L102">             PreparedStatement ps = connection.prepareStatement(query)) {</span>
+            
+<span class="nc" id="L104">            ps.setInt(1, limit);</span>
+<span class="nc" id="L105">            System.out.println(&quot;Executing query: &quot; + query);</span>
+<span class="nc" id="L106">            ResultSet rs = ps.executeQuery();</span>
+            
+<span class="nc bnc" id="L108" title="All 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc" id="L109">                Movie movie = new Movie();</span>
+<span class="nc" id="L110">                movie.setMovieId(rs.getInt(&quot;movie_id&quot;));</span>
+<span class="nc" id="L111">                movie.setTitle(rs.getString(&quot;title&quot;));</span>
+<span class="nc" id="L112">                movie.setDescription(rs.getString(&quot;description&quot;));</span>
+<span class="nc" id="L113">                movie.setGenre(rs.getString(&quot;genre&quot;));</span>
+<span class="nc" id="L114">                movie.setRating(rs.getBigDecimal(&quot;rating&quot;));</span>
+<span class="nc" id="L115">                movie.setImageUrl(rs.getString(&quot;image_url&quot;));</span>
+<span class="nc" id="L116">                movie.setPrice(rs.getDouble(&quot;price&quot;));</span>
+<span class="nc" id="L117">                movie.setCreatedAt(rs.getTimestamp(&quot;created_at&quot;));</span>
+<span class="nc" id="L118">                movies.add(movie);</span>
+<span class="nc" id="L119">                System.out.println(&quot;Loaded recent movie: &quot; + movie.getTitle());</span>
+<span class="nc" id="L120">            }</span>
+<span class="nc" id="L121">        } catch (SQLException e) {</span>
+<span class="nc" id="L122">            System.err.println(&quot;Database error: &quot; + e.getMessage());</span>
+<span class="nc" id="L123">            e.printStackTrace();</span>
+<span class="nc" id="L124">        }</span>
+<span class="nc" id="L125">        return movies;</span>
+    }
+
+    public boolean addMovie(Movie movie) throws SQLException {
+<span class="fc" id="L129">        try (Connection connection = DriverManager.getConnection(jdbcURL, jdbcUsername, jdbcPassword);</span>
+<span class="fc" id="L130">             PreparedStatement stmt = connection.prepareStatement(ADD_MOVIE, Statement.RETURN_GENERATED_KEYS)) {</span>
+<span class="fc" id="L131">            stmt.setString(1, movie.getTitle());</span>
+<span class="fc" id="L132">            stmt.setString(2, movie.getDescription());</span>
+<span class="fc" id="L133">            stmt.setString(3, movie.getGenre());</span>
+<span class="fc" id="L134">            stmt.setString(4, movie.getDuration());</span>
+<span class="fc" id="L135">            stmt.setDate(5, movie.getReleaseDate());</span>
+<span class="fc" id="L136">            stmt.setString(6, movie.getStatus());</span>
+<span class="fc" id="L137">            stmt.setBigDecimal(7, movie.getRating());</span>
+<span class="fc" id="L138">            stmt.setString(8, movie.getImageUrl());</span>
+<span class="fc" id="L139">            stmt.setDouble(9, movie.getPrice());</span>
+            
+<span class="fc" id="L141">            int affectedRows = stmt.executeUpdate();</span>
+<span class="pc bpc" id="L142" title="1 of 2 branches missed.">            if (affectedRows &gt; 0) {</span>
+<span class="fc" id="L143">                try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {</span>
+<span class="pc bpc" id="L144" title="1 of 2 branches missed.">                    if (generatedKeys.next()) {</span>
+<span class="fc" id="L145">                        movie.setMovieId(generatedKeys.getInt(1));</span>
+<span class="fc" id="L146">                        return true;</span>
+                    }
+<span class="pc bpc" id="L148" title="1 of 2 branches missed.">                }</span>
+            }
+<span class="nc" id="L150">            return false;</span>
+<span class="pc bpc" id="L151" title="2 of 4 branches missed.">        }</span>
+    }
+
+    public boolean updateMovie(Movie movie) throws SQLException {
+<span class="fc" id="L155">        try (Connection connection = DriverManager.getConnection(jdbcURL, jdbcUsername, jdbcPassword);</span>
+<span class="fc" id="L156">             PreparedStatement stmt = connection.prepareStatement(UPDATE_MOVIE)) {</span>
+<span class="fc" id="L157">            stmt.setString(1, movie.getTitle());</span>
+<span class="fc" id="L158">            stmt.setString(2, movie.getDescription());</span>
+<span class="fc" id="L159">            stmt.setString(3, movie.getGenre());</span>
+<span class="fc" id="L160">            stmt.setString(4, movie.getDuration());</span>
+<span class="fc" id="L161">            stmt.setDate(5, movie.getReleaseDate());</span>
+<span class="fc" id="L162">            stmt.setString(6, movie.getStatus());</span>
+<span class="fc" id="L163">            stmt.setBigDecimal(7, movie.getRating());</span>
+<span class="fc" id="L164">            stmt.setString(8, movie.getImageUrl());</span>
+<span class="fc" id="L165">            stmt.setDouble(9, movie.getPrice());</span>
+<span class="fc" id="L166">            stmt.setInt(10, movie.getMovieId());</span>
+<span class="pc bpc" id="L167" title="1 of 2 branches missed.">            return stmt.executeUpdate() &gt; 0;</span>
+        }
+    }
+
+    public boolean deleteMovie(int movieId) throws SQLException {
+<span class="fc" id="L172">        try (Connection connection = DriverManager.getConnection(jdbcURL, jdbcUsername, jdbcPassword);</span>
+<span class="fc" id="L173">             PreparedStatement stmt = connection.prepareStatement(DELETE_MOVIE)) {</span>
+<span class="fc" id="L174">            stmt.setInt(1, movieId);</span>
+<span class="pc bpc" id="L175" title="1 of 2 branches missed.">            return stmt.executeUpdate() &gt; 0;</span>
+        }
+    }
+
+    
+    private void setMovieParameters(PreparedStatement stmt, Movie movie) throws SQLException {
+<span class="nc" id="L181">        stmt.setString(1, movie.getTitle());</span>
+<span class="nc" id="L182">        stmt.setString(2, movie.getDescription());</span>
+<span class="nc" id="L183">        stmt.setString(3, movie.getGenre());</span>
+<span class="nc" id="L184">        stmt.setString(4, movie.getDuration());</span>
+<span class="nc" id="L185">        stmt.setDate(5, movie.getReleaseDate());</span>
+<span class="nc" id="L186">        stmt.setString(6, movie.getStatus());</span>
+<span class="nc" id="L187">        stmt.setBigDecimal(7, movie.getRating());</span>
+<span class="nc" id="L188">        stmt.setString(8, movie.getImageUrl());</span>
+<span class="nc" id="L189">        stmt.setDouble(9, movie.getPrice());</span>
+<span class="nc" id="L190">    }</span>
+
+    public int getLastInsertedId() throws SQLException {
+<span class="nc" id="L193">        String sql = &quot;SELECT LAST_INSERT_ID()&quot;;</span>
+<span class="nc" id="L194">        try (Connection conn = DatabaseConnection.getConnection();</span>
+<span class="nc" id="L195">             Statement stmt = conn.createStatement();</span>
+<span class="nc" id="L196">             ResultSet rs = stmt.executeQuery(sql)) {</span>
+<span class="nc bnc" id="L197" title="All 2 branches missed.">            if (rs.next()) {</span>
+<span class="nc" id="L198">                return rs.getInt(1);</span>
+            }
+<span class="nc" id="L200">            return -1;</span>
+<span class="nc bnc" id="L201" title="All 6 branches missed.">        }</span>
+    }
+    
+}
+
+
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

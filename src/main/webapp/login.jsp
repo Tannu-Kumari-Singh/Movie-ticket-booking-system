@@ -2,6 +2,8 @@
 	pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 
+
+
 <html>
 <head>
     <meta charset="UTF-8">
@@ -11,6 +13,7 @@
     <link href="css/styles.css" rel="stylesheet">
 </head>
 <body>
+<%@ include file="navbar.jsp"%>
     <div class="container mt-5">
         <div class="form-container">
             <h2 class="text-center mb-4">Login</h2>
@@ -19,6 +22,12 @@
             <% if(request.getAttribute("error") != null) { %>
                 <div class="alert alert-danger">
                     <%= request.getAttribute("error") %>
+                </div>
+            <% } %>
+            <% if(session.getAttribute("error") != null) { %>
+                <div class="alert alert-danger">
+                    <%= session.getAttribute("error") %>
+                    <% session.removeAttribute("error"); %>
                 </div>
             <% } %>
             
@@ -35,6 +44,13 @@
                     <label for="password">Password</label>
                     <input type="password" class="form-control" id="password" name="password" required>
                     <div class="invalid-feedback"></div>
+                </div>
+
+                <div class="form-group">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="adminLogin" name="adminLogin">
+                        <label class="form-check-label" for="adminLogin">Login as Administrator</label>
+                    </div>
                 </div>
 
                 <button type="submit" class="btn btn-primary btn-block">Login</button>
