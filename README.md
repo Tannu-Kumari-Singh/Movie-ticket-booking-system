@@ -1,135 +1,4 @@
-# Movie Ticket Booking System
- 
-  This repository hosts the code for an Online Movie Ticket Booking System built in Java. 
-  This application allows users to browse movies, check available showtimes, and book tickets online. The project follows a structured MVC architecture and is designed to provide a seamless booking experience.
-  A web-based application that allows users to browse movies and book tickets online. Built with Java Servlets, JSP, and MySQL.
 
-## Features
-   ### Both Admin and User Features
-
-    - User Authentication
-      - Register new account
-      - Login/Logout
-      - Profile management
-      - Update Profile
-                    
-    - Admin Authentication
-       - Admin Login
-       - Admin Dashboard for management of movies, shows, theatres, users, and bookings
-
-    - Movie Management
-       - Browse available movies
-       - Search movies
-       - View movie details
-       - Real-time seat availability
-
-    - Booking System
-       - Select show time and seats
-       - Book multiple tickets
-       - View booking history
-       - Ticket download
-                  
-    - Showtime Management
-       - Browse showtime
-       - Book ticket for that Showtime
-       - Browse Particular movie showtime
-                  
-    - Theatre Management 
-       - Add a new Theatre
-       - Delete a Theatre 
-       - Update a theatre
-                
-
-## Technology Stack
-
-   ### Frontend
-    - JSP (JavaServer Pages)
-    - HTML5
-    - CSS3
-    - JavaScript
-    - Bootstrap 4.5.2
-
-   ### Backend
-    - Java Model classes
-    - Java DAO classes
-    - Java Servlets
-    - JDBC
-    - MySQL 
-            
-
-   ### Tools & Libraries
-    - Maven
-    - jQuery
-    - Font Awesome
-    - MySQL Connector/J
-
-## Prerequisites
-
-    - JDK 11 or higher
-    - Apache Tomcat 10.x or higher
-    - MySQL 8.0
-    - Maven 5.x
-    - IDE (Eclipse/IntelliJ IDEA)
-
-# Database Setup
-
-   ### 1. Create a new MySQL database:
-    -Follow schema.sql
-                   
-   ### 2.Create the required tables:
-    -Follow schema.sql
-
-
-
-# Installation & Setup
-   ### 1.Clone the repository:
-   git clone: https://github.com/Tannu-kumari-Singh/movie-ticket-booking-system.git
-
-  ### 2.Configure database connection:
-
-    -Open src/main/java/com/util/Constants.java
-    -Update the database URL, username, and password according to yours
-
- ### 3.Build the project:
-    mvn clean install
- ### 4.Deploy to Tomcat:
-
-    Copy the WAR file from target/movie-ticket-booking-system.war to Tomcat's webapps directory
-    Start Tomcat server
- ### 5.Access the application:
-    http://localhost:8080/movie-ticket-booking-system
- # Project Structure
-       movie-ticket-booking-system/
-       ├── src/
-       │   ├── main/
-       │   │   ├── java/
-       │   │   │   ├── com/
-       │   │   │   │   ├── controller/
-       │   │   │   │   ├── booking/
-       │   │   │   │   |  |___ model/
-       │   │   │   │   |  |___ dao/
-       │   │   │   │   |___ User/
-       │   │   │   │   |  |__ model/
-       │   │   │   │   |  |__ dao/
-       │   │   │   │   ├── theatre/
-       │   │   │   │   |  |___ model/
-       │   │   │   │   |  |___ dao/
-       │   │   │   │   ├── showtime/
-       │   │   │   │   |  |___ model/
-       │   │   │   │   |  |___ dao/
-       │   │   │   │   ├── movie/
-       │   │   │   │   |  |___ model/
-       │   │   │   │   |  |___ dao/
-       │   │   │   │   └── filter/
-       │   │   ├── webapp/
-       │   │   │   ├── css/
-       │   │   │   ├── js/
-       │   │   │   ├── WEB-INF/
-       │   │   │   └── *.jsp
-       │   │   └── resources/
-       │   └── test/
-       ├── pom.xml
-       └── README.md
 ## User Login, Booking a ticket and Download Ticket.
  ### Click on login at top right of the page.
    ![Screenshot 2025-01-03 144750](https://github.com/user-attachments/assets/13a71504-bdea-4cc8-9058-533f5e4e4374)
@@ -145,7 +14,141 @@
  ### Then do the payment.
    ![Screenshot 2025-01-03 141103](https://github.com/user-attachments/assets/83527b5f-1cf8-4dec-b024-7ee7cab04c6a)
  ### After that booking succesful message will appear and your ticket will be genrated.
-   ![Screenshot 2025-01-03 141109](https://github.com/user-attachments/assets/42ba3c2d-8827-47ff-a422-991831dbda7f)
+   ![Screenshot 2025-01-03 141109](https://github.com/user-attachments/assets/42ba3c2d-8827-47# Movie Ticket Booking System
+  A comprehensive web-based movie ticket booking platform built with Java EE, offering a seamless cinema ticketing experience.
+  A web-based application that allows users to browse movies and book tickets online. Built with Java Servlets, JSP, and MySQL.
+  This repository hosts the code for an Online Movie Ticket Booking System built in Java. 
+  This application allows users to browse movies, check available showtimes, and book tickets online. The project follows a structured MVC architecture and is designed to provide a seamless booking experience.
+
+
+
+## 🎬 Features
+### Both for Admin and User
+
+- **User Management**
+  - User registration and authentication
+  - Profile management
+  - Booking history
+  - Admin Authentication
+       - Admin Login
+       - Admin Dashboard for management of movies, shows, theatres, users, and bookings
+
+- **Movie Management**
+  - Dynamic movie listings
+  - Detailed movie information
+  - Genre categorization
+  - Release date tracking
+  - Price management
+
+- **Theatre Management**
+  - Multiple theatre support
+  - Screen management
+  - Seat layout configuration
+  - Theatre location tracking
+
+- **Booking System**
+  - Real-time seat selection
+  - Multiple showtime options
+  - Secure payment integration
+  - E-ticket generation
+  - Booking confirmation
+    
+- **Admin Dashboard**
+   - Overview
+   - User Management
+   - Movie Management(Addition, Updation, Deletion)
+   - Theatre Management(Addition, Updation, Deletion)
+   - Shows Managament(Addition, Updation, Deletion)
+   - Booking Management(Addition, Updation)
+
+## 🛠️ Technology Stack
+
+- **Backend**
+  - Java EE
+  - Servlets
+  - JSP
+  - JDBC
+  - MySQL
+
+- **Frontend**
+  - HTML5
+  - CSS3
+  - JavaScript
+  - Bootstrap 4
+  - Font Awesome
+
+- **Database**
+  - MySQL 8.0
+
+## ⚙️ Setup Requirements
+
+- JDK 11 or higher
+- Apache Tomcat 9.0 or higher
+- MySQL 8.0
+- Maven
+
+## 🚀 Database Setup
+
+ - **Create a new MySQL database:**
+   - Follow schema.sql
+                   
+ - **Create the required tables:**
+   - Follow schema.sql
+
+
+
+## Installation & Setup
+  - **Clone the repository:**
+    - git clone: https://github.com/Nitin-Yadav-developer/movie-ticket-booking-system.git
+
+  - **Configure database connection:**
+     - Open src/main/java/com/util/Constants.java
+     - Update the database URL, username, and password according to yours
+
+  - **Build the project:**
+    
+        - mvn clean install
+       
+  - **Deploy to Tomcat:**
+     - Copy the WAR file from target/movie-ticket-booking-system.war to Tomcat's webapps directory
+     - Start Tomcat server
+       
+  - **Access the application:**
+    
+        -  http://localhost:8080/movie-ticket-booking-system
+ # 📁 Project Structure
+       movie-ticket-booking-system/
+       ├── src/
+       │   ├── main/
+       │   │   ├── java/
+       │   │   │   ├── com/
+       │   │   │   │   ├── controller/
+       │   │   │   │   ├── booking/
+       │   │   │   │   |  ├── model/
+       │   │   │   │   |  ├── dao/
+       │   │   │   │   ├── User/
+       │   │   │   │   |  ├── model/
+       │   │   │   │   |  ├── dao/
+       │   │   │   │   ├── theatre/
+       │   │   │   │   |  ├── model/
+       │   │   │   │   |  ├── dao/
+       │   │   │   │   ├── showtime/
+       │   │   │   │   |  ├── model/
+       │   │   │   │   |  ├── dao/
+       │   │   │   │   ├── movie/
+       │   │   │   │   |  ├── model/
+       │   │   │   │   |  ├── dao/
+       │   │   │   │   ├── filter/
+       │   │   │   │   └── util/
+       │   │   ├── webapp/
+       │   │   │   ├── css/
+       │   │   │   ├── js/
+       │   │   │   ├── WEB-INF/
+       │   │   │   └── *.jsp
+       │   │   └── resources/
+       │   └── test/
+       ├── pom.xml
+       └── README.mdff-a422-991831dbda7f)
  ### Download Your Ticket.
    user can download his ticket from my booking section also if he lost his ticket and also can see his past bookings.
    ![Screenshot 2025-01-03 141120](https://github.com/user-attachments/assets/5df0196b-ad3f-4ae4-8dd2-4ebb61c0607c)
